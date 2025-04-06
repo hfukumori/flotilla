@@ -544,11 +544,17 @@ namespace SpaceShooter
         }
     }
 
+    [Serializable]
     public class LogEvent
     {
         public Rectangle image;
         public string description;
 
+        public LogEvent()
+        {
+            this.image = Rectangle.Empty;
+            this.description = "";
+        }
         public LogEvent(Rectangle img, string txt)
         {
             this.image = img;

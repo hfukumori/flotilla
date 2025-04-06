@@ -19,6 +19,7 @@ namespace SpaceShooter
     /// <summary>
     /// A carryable item.
     /// </summary>
+    [Serializable]
     public class InventoryItem
     {
         public Rectangle image = Rectangle.Empty;

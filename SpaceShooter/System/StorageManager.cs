@@ -92,6 +92,8 @@ namespace SpaceShooter
     public class Adventure
     {
         public WorldMapSave WorldMapSave { get; set; }
+        public PlayerCommanderSave PlayerCommanderSave { get; set; }
+        public EventSave EventSave { get; set; }
     }
 
     [Serializable]
@@ -99,6 +101,42 @@ namespace SpaceShooter
     {
         public List<Location> Locations { get; set; }
         public Location CurrentLocation { get; set; }
+    }
+
+    [Serializable]
+    public class PlayerCommanderSave
+    {
+        public List<FleetShipSave> CampaignShips { get; set; }
+    }
+
+    [Serializable]
+    public class FleetShipSave
+    {
+        public string captainName;
+        public ModelType shipType;
+        public InventoryItem[] upgradeArray;
+        public int veterancy;
+        public bool childShip;
+        public SpaceShipStats stats;
+    }
+
+    [Serializable]
+    public class EventSave
+    {
+        public bool kToucansOnboard;
+        public bool kPandaOnboard;
+        public bool kCrisiumOnBoard;
+        public bool kHaveGauntlet;
+
+        public List<InventoryItem> tradeItems;
+        public List<LogEvent> Logs { get; set; }
+
+        public List<InventoryItem> inventoryPool;
+
+        public List<String> eventPool;
+        public List<String> dangerPool;
+        public List<String> wormPool;
+        public List<String> unlockableEventPool;
     }
 
     public static class StorageXNA4
@@ -657,14 +695,12 @@ namespace SpaceShooter
                 {
                     try
                     {
-                        Adventure adventure = new Adventure
-                        {
-                            WorldMapSave = new WorldMapSave
-                            {
-                                Locations = worldMap.Locations,
-                                CurrentLocation = worldMap.CurrentLocation
-                            }
-                        };
+                        Adventure adventure = new Adventure();
+
+                        adventure.WorldMapSave = CreateWorldMapSave(worldMap);
+                        adventure.PlayerCommanderSave = CreatePlayerCommanderSave();
+                        adventure.EventSave = CreateEventSave(worldMap);
+
                         XmlSerializer serializer = new XmlSerializer(typeof(Adventure));
                         serializer.Serialize(stream, adventure);
                     }
@@ -676,12 +712,49 @@ namespace SpaceShooter
             }
         }
 
+        private static WorldMapSave CreateWorldMapSave(WorldMap worldMap)
+        {
+            WorldMapSave worldMapSave = new WorldMapSave
+            {
+                Locations = worldMap.Locations,
+                CurrentLocation = worldMap.CurrentLocation
+            };
+            return worldMapSave;
+        }
+        private static PlayerCommanderSave CreatePlayerCommanderSave()
+        {
+            List<FleetShipSave> campaignShips = new List<FleetShipSave>();
+            foreach (FleetShip fleetShip in FrameworkCore.players[0].campaignShips)
+            {
+                FleetShipSave fleetShipSave = new FleetShipSave
+                {
+                    captainName = fleetShip.captainName,
+                    shipType = fleetShip.shipData.modelname,
+                    upgradeArray = fleetShip.upgradeArray,
+                    veterancy = fleetShip.veterancy,
+                    childShip = fleetShip.childShip,
+                    stats = fleetShip.stats
+                };
+                campaignShips.Add(fleetShipSave);
+            }
 
+            PlayerCommanderSave playerCommanderSave = new PlayerCommanderSave
+            {
+                CampaignShips = campaignShips
+            };
+            return playerCommanderSave;
+        }
 
-
-
-
-
-
+        private static EventSave CreateEventSave(WorldMap worldMap)
+        {
+            EventSave eventSave = new EventSave
+            {
+                kToucansOnboard = worldMap.evManager.kToucansOnboard,
+                kPandaOnboard = worldMap.evManager.kPandaOnboard,
+                kCrisiumOnBoard = worldMap.evManager.kCrisiumOnBoard,
+                kHaveGauntlet = worldMap.evManager.kHaveGauntlet,
+            };
+            return eventSave;
+        }
     }
 }
