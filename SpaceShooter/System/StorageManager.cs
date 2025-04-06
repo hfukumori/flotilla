@@ -88,6 +88,19 @@ namespace SpaceShooter
         }
     }
 
+    [Serializable]
+    public class Adventure
+    {
+        public WorldMapSave WorldMapSave { get; set; }
+    }
+
+    [Serializable]
+    public class WorldMapSave
+    {
+        public List<Location> Locations { get; set; }
+        public Location CurrentLocation { get; set; }
+    }
+
     public static class StorageXNA4
     {
         public static StorageContainer OpenContainer(this StorageDevice device, string displayName)
@@ -103,6 +116,7 @@ namespace SpaceShooter
         static public readonly string SAVEFILE= "saveinfo.dat";
         static public readonly string SCOREFILE = "scores.dat";
         static public readonly string PCFILE = "settings.xml";
+        static public readonly string ADVENTUREFILE = "adventure.xml";
 
         /// <summary>
         /// Location of the player profile's save area.
@@ -632,6 +646,35 @@ namespace SpaceShooter
 
         }
 
+        public void SaveAdventure(WorldMap worldMap)
+        {
+            Console.WriteLine("Saving Adventure");
+            if (device == null)
+                return;
+            using (StorageContainer container = device.OpenContainer(GAMENAME))
+            {
+                using (Stream stream = container.OpenFile(ADVENTUREFILE, FileMode.Create))
+                {
+                    try
+                    {
+                        Adventure adventure = new Adventure
+                        {
+                            WorldMapSave = new WorldMapSave
+                            {
+                                Locations = worldMap.Locations,
+                                CurrentLocation = worldMap.CurrentLocation
+                            }
+                        };
+                        XmlSerializer serializer = new XmlSerializer(typeof(Adventure));
+                        serializer.Serialize(stream, adventure);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+        }
 
 
 
@@ -640,6 +683,5 @@ namespace SpaceShooter
 
 
 
-        
     }
 }

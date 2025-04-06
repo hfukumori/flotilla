@@ -27,6 +27,8 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace SpaceShooter
 {
+ 
+    [Serializable]
     public class Location
     {
         public string name;
@@ -383,6 +385,17 @@ namespace SpaceShooter
         }
 
         Location currentLocation = null;
+        public Location CurrentLocation
+        {
+            get
+            {
+                return currentLocation;
+            }
+            set
+            {
+                currentLocation = value;
+            }
+        }
         Location destinationLocation = null;
         Vector3 currentPosition = Vector3.Zero;
 
@@ -1031,7 +1044,8 @@ namespace SpaceShooter
                             eventManager.AddLog(sprite.eventSprites.flamingo, eResource.logFlamingo);
                             menuManager.AddMenu(new LogMenu(false, true));
                         }
-
+                        // Save here
+                        FrameworkCore.storagemanager.SaveAdventure(this);
                         worldState = WorldState.ReadyForOrders;
                         FrameworkCore.PlayCue(sounds.Music.none);
                     }
