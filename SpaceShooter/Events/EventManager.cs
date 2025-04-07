@@ -67,24 +67,24 @@ namespace SpaceShooter
         }
 
 
-        List<InventoryItem> inventoryPool;
-        List<Event> eventPool;
+        public List<InventoryItem> inventoryPool;
+        public List<Event> eventPool;
 
-        List<Event> dangerPool;
+        public List<Event> dangerPool;
         public int dangerPoolCount
         {
             get { return dangerPool.Count; }
         }
 
 
-        List<Event> wormPool;
+        public List<Event> wormPool;
         public int wormPoolCount
         {
             get { return wormPool.Count; }
         }
 
 
-        List<Event> unlockableEventPool;
+        public List<Event> unlockableEventPool;
         SysMenuManager menuManager;
 
 

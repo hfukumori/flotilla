@@ -128,10 +128,10 @@ namespace SpaceShooter
         public bool kCrisiumOnBoard;
         public bool kHaveGauntlet;
 
-        public List<InventoryItem> tradeItems;
+        public List<InventoryItem> tradeItems { get; set; }
         public List<LogEvent> Logs { get; set; }
 
-        public List<InventoryItem> inventoryPool;
+        public List<InventoryItem> inventoryPool { get; set; }
 
         public List<String> eventPool;
         public List<String> dangerPool;
@@ -707,6 +707,7 @@ namespace SpaceShooter
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
+                        Console.WriteLine(ex.StackTrace);
                     }
                 }
             }
@@ -747,12 +748,54 @@ namespace SpaceShooter
 
         private static EventSave CreateEventSave(WorldMap worldMap)
         {
+            EventManager eventManager = worldMap.evManager;
+            List<InventoryItem> tradeItems = new List<InventoryItem>();
+            //foreach (InventoryItem item in eventManager.tradeItems)
+            //{
+            //    tradeItems.Add(item);
+            //}
+            List<LogEvent> logs = new List<LogEvent>();
+            foreach (LogEvent log in eventManager.Logs)
+            {
+                logs.Add(log);
+            }
+
+            List<String> eventPool = new List<String>();
+            foreach (Event ev in eventManager.eventPool)
+            {
+                eventPool.Add(ev.GetType().Name);
+            }
+
+            List<String> dangerPool = new List<String>();
+            foreach (Event ev in eventManager.dangerPool)
+            {
+                dangerPool.Add(ev.GetType().Name);
+            }
+
+            List<String> wormPool = new List<String>();
+            foreach (Event ev in eventManager.wormPool)
+            {
+                wormPool.Add(ev.GetType().Name);
+            }
+
+            List<String> unlockableEventPool = new List<String>();
+            foreach (Event ev in eventManager.unlockableEventPool)
+            {
+                unlockableEventPool.Add(ev.GetType().Name);
+            }
+
             EventSave eventSave = new EventSave
             {
-                kToucansOnboard = worldMap.evManager.kToucansOnboard,
-                kPandaOnboard = worldMap.evManager.kPandaOnboard,
-                kCrisiumOnBoard = worldMap.evManager.kCrisiumOnBoard,
-                kHaveGauntlet = worldMap.evManager.kHaveGauntlet,
+                kToucansOnboard = eventManager.kToucansOnboard,
+                kPandaOnboard = eventManager.kPandaOnboard,
+                kCrisiumOnBoard = eventManager.kCrisiumOnBoard,
+                kHaveGauntlet = eventManager.kHaveGauntlet,
+                tradeItems = tradeItems,
+                Logs = logs,
+                eventPool = eventPool,
+                dangerPool = dangerPool,
+                wormPool = wormPool,
+                unlockableEventPool = unlockableEventPool,
             };
             return eventSave;
         }
