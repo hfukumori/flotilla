@@ -101,12 +101,24 @@ namespace SpaceShooter
     {
         public List<Location> Locations { get; set; }
         public Location CurrentLocation { get; set; }
+
+        public WorldMapSave()
+        {
+            // default constructor for XML serialization
+        }
+
+        public WorldMapSave(WorldMap worldMap)
+        {
+            Locations = worldMap.Locations;
+            CurrentLocation = worldMap.CurrentLocation;
+        }
     }
 
     [Serializable]
     public class PlayerCommanderSave
     {
-        public List<FleetShipSave> CampaignShips { get; set; }
+        public List<InventoryItemSave> inventoryItems;
+        public List<FleetShipSave> campaignShips;
     }
 
     [Serializable]
@@ -114,7 +126,7 @@ namespace SpaceShooter
     {
         public string captainName;
         public ModelType shipType;
-        public InventoryItem[] upgradeArray;
+        public InventoryItemSave[] upgradeArray;
         public int veterancy;
         public bool childShip;
         public SpaceShipStats stats;
@@ -128,7 +140,7 @@ namespace SpaceShooter
         public bool kCrisiumOnBoard;
         public bool kHaveGauntlet;
 
-        public List<InventoryItem> tradeItems { get; set; }
+        public List<InventoryItemSave> tradeItems { get; set; }
         public List<LogEvent> Logs { get; set; }
 
         public List<InventoryItem> inventoryPool { get; set; }
@@ -137,6 +149,24 @@ namespace SpaceShooter
         public List<String> dangerPool;
         public List<String> wormPool;
         public List<String> unlockableEventPool;
+    }
+
+    [Serializable]
+    public class InventoryItemSave
+    {
+        public string itemType;
+        public float? constructorParam;
+
+        public InventoryItemSave()
+        {
+            // Default constructor for XML serialization
+        }
+
+        public InventoryItemSave(InventoryItem item)
+        {
+            itemType = item.GetType().Name;
+            constructorParam = item.constructorParam;
+        }
     }
 
     public static class StorageXNA4
@@ -697,12 +727,21 @@ namespace SpaceShooter
                     {
                         Adventure adventure = new Adventure();
 
-                        adventure.WorldMapSave = CreateWorldMapSave(worldMap);
+                        adventure.WorldMapSave = new WorldMapSave(worldMap);
                         adventure.PlayerCommanderSave = CreatePlayerCommanderSave();
                         adventure.EventSave = CreateEventSave(worldMap);
 
                         XmlSerializer serializer = new XmlSerializer(typeof(Adventure));
                         serializer.Serialize(stream, adventure);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        Console.WriteLine("Serialization error: " + ex.Message);
+                        if (ex.InnerException != null)
+                        {
+                            Console.WriteLine("Inner exception: " + ex.InnerException.Message);
+                        }
+                        Console.WriteLine(ex.StackTrace);
                     }
                     catch (Exception ex)
                     {
@@ -713,15 +752,6 @@ namespace SpaceShooter
             }
         }
 
-        private static WorldMapSave CreateWorldMapSave(WorldMap worldMap)
-        {
-            WorldMapSave worldMapSave = new WorldMapSave
-            {
-                Locations = worldMap.Locations,
-                CurrentLocation = worldMap.CurrentLocation
-            };
-            return worldMapSave;
-        }
         private static PlayerCommanderSave CreatePlayerCommanderSave()
         {
             List<FleetShipSave> campaignShips = new List<FleetShipSave>();
@@ -731,7 +761,7 @@ namespace SpaceShooter
                 {
                     captainName = fleetShip.captainName,
                     shipType = fleetShip.shipData.modelname,
-                    upgradeArray = fleetShip.upgradeArray,
+                    upgradeArray = CreateUpgradeArraySave(fleetShip),
                     veterancy = fleetShip.veterancy,
                     childShip = fleetShip.childShip,
                     stats = fleetShip.stats
@@ -741,19 +771,53 @@ namespace SpaceShooter
 
             PlayerCommanderSave playerCommanderSave = new PlayerCommanderSave
             {
-                CampaignShips = campaignShips
+                inventoryItems = CreateInventoryItems(),
+                campaignShips = campaignShips,
             };
             return playerCommanderSave;
+        }
+
+        private static List<InventoryItemSave> CreateInventoryItems()
+        {
+            List<InventoryItemSave> inventoryItemSaves = new List<InventoryItemSave>();
+            List<InventoryItem> inventoryItems = FrameworkCore.players[0].inventoryItems;
+            foreach (InventoryItem inventoryItem in inventoryItems)
+            {
+                inventoryItemSaves.Add(new InventoryItemSave(inventoryItem));
+            }
+            return inventoryItemSaves;
+        }
+
+        private static InventoryItemSave[] CreateUpgradeArraySave(FleetShip fleetShip)
+        {
+            int upgradeArrayLength = fleetShip.upgradeArray.Length;
+            InventoryItemSave[] upgradeArray = new InventoryItemSave[upgradeArrayLength];
+            for (int i = 0; i < upgradeArrayLength; i++)
+            {
+                InventoryItem item = fleetShip.upgradeArray[i];
+                if (item != null)
+                {
+                    upgradeArray[i] = new InventoryItemSave(item);
+                }
+            }
+
+            return upgradeArray;
         }
 
         private static EventSave CreateEventSave(WorldMap worldMap)
         {
             EventManager eventManager = worldMap.evManager;
-            List<InventoryItem> tradeItems = new List<InventoryItem>();
-            //foreach (InventoryItem item in eventManager.tradeItems)
-            //{
-            //    tradeItems.Add(item);
-            //}
+            List<InventoryItemSave> tradeItems = new List<InventoryItemSave>();
+            foreach (InventoryItem item in eventManager.tradeItems)
+            {
+                InventoryItemSave itemSave = new InventoryItemSave
+                {
+                    itemType = item.GetType().Name,
+                    constructorParam = item.constructorParam
+                };
+                tradeItems.Add(itemSave);
+            }
+
             List<LogEvent> logs = new List<LogEvent>();
             foreach (LogEvent log in eventManager.Logs)
             {

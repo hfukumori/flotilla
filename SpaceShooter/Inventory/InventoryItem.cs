@@ -27,5 +27,8 @@ namespace SpaceShooter
         public string description = "Default Description";
 
         public GameEffect gameEffect;
+
+        // Used to keep effect value for serialization
+        public float? constructorParam = null;
     }
 }
