@@ -1044,8 +1044,8 @@ namespace SpaceShooter
                             eventManager.AddLog(sprite.eventSprites.flamingo, eResource.logFlamingo);
                             menuManager.AddMenu(new LogMenu(false, true));
                         }
-                        // Save here
-                        FrameworkCore.storagemanager.SaveAdventure(this);
+                        // Save Current Adventure
+                        FrameworkCore.storagemanager.SaveAdventure(this, FrameworkCore.players[0]);
                         worldState = WorldState.ReadyForOrders;
                         FrameworkCore.PlayCue(sounds.Music.none);
                     }
