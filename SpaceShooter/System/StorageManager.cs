@@ -89,26 +89,34 @@ namespace SpaceShooter
     }
 
     [Serializable]
-    public class Adventure
+    public class CampaignSave
     {
         public bool isHardcoreMode;
-        public WorldMapForSave WorldMap { get; set; }
-        public PlayerCommanderForSave PlayerCommander { get; set; }
-        public EventForSave Event { get; set; }
+        public WorldMapSave WorldMap { get; set; }
+        public PlayerCommanderSave PlayerCommander { get; set; }
+        public EventSave Event { get; set; }
+    }
+
+    public class CampaignLoad
+    {
+        public bool isHardcoreMode;
+        public WorldMap worldMap;
+        public PlayerCommander playerCommander;
+        public EventManager eventManager;
     }
 
     [Serializable]
-    public class WorldMapForSave
+    public class WorldMapSave
     {
         public List<Location> Locations { get; set; }
         public Location CurrentLocation { get; set; }
 
-        public WorldMapForSave()
+        public WorldMapSave()
         {
             // default constructor for XML serialization
         }
 
-        public WorldMapForSave(WorldMap worldMap)
+        public WorldMapSave(WorldMap worldMap)
         {
             Locations = worldMap.Locations;
             CurrentLocation = worldMap.CurrentLocation;
@@ -116,50 +124,35 @@ namespace SpaceShooter
     }
 
     [Serializable]
-    public class PlayerCommanderForSave
+    public class PlayerCommanderSave
     {
-        public List<InventoryItemForSave> inventoryItems;
-        public List<FleetShipForSave> campaignShips;
+        public List<InventoryItemSave> inventoryItems;
+        public List<FleetShipSave> campaignShips;
     }
 
     [Serializable]
-    public class FleetShipForSave
+    public class FleetShipSave
     {
         public string captainName;
         public ModelType shipType;
-        public InventoryItemForSave[] upgradeArray;
+        public InventoryItemSave[] upgradeArray;
         public int veterancy;
         public bool childShip;
         public SpaceShipStats stats;
-
-        public FleetShipForSave()
-        {
-            // Default constructor for XML serialization
-        }
-
-        public FleetShipForSave(FleetShip fleetShip)
-        {
-            captainName = fleetShip.captainName;
-            shipType = fleetShip.shipData.modelname;
-            upgradeArray = StorageManager.CreateUpgradeArrayForSave(fleetShip.upgradeArray);
-            veterancy = fleetShip.veterancy;
-            childShip = fleetShip.childShip;
-            stats = fleetShip.stats;
-        }
     }
 
     [Serializable]
-    public class EventForSave
+    public class EventSave
     {
         public bool kToucansOnboard;
         public bool kPandaOnboard;
         public bool kCrisiumOnBoard;
         public bool kHaveGauntlet;
 
-        public List<InventoryItemForSave> tradeItems { get; set; }
+        public List<InventoryItemSave> tradeItems { get; set; }
         public List<LogEvent> Logs { get; set; }
 
-        public List<InventoryItemForSave> inventoryPool { get; set; }
+        public List<InventoryItemSave> inventoryPool { get; set; }
 
         public List<String> eventPool;
         public List<String> dangerPool;
@@ -168,17 +161,17 @@ namespace SpaceShooter
     }
 
     [Serializable]
-    public class InventoryItemForSave
+    public class InventoryItemSave
     {
         public string itemType;
         public float? constructorParam;
 
-        public InventoryItemForSave()
+        public InventoryItemSave()
         {
             // Default constructor for XML serialization
         }
 
-        public InventoryItemForSave(InventoryItem item)
+        public InventoryItemSave(InventoryItem item)
         {
             itemType = item.GetType().Name;
             constructorParam = item.constructorParam;
@@ -741,15 +734,15 @@ namespace SpaceShooter
                 {
                     try
                     {
-                        Adventure adventure = new Adventure()
+                        CampaignSave adventure = new CampaignSave()
                         {
                             isHardcoreMode = FrameworkCore.isHardcoreMode,
-                            WorldMap = new WorldMapForSave(worldMap),
-                            PlayerCommander = CreatePlayerCommanderForSave(player),
-                            Event = CreateEventForSave(worldMap),
+                            WorldMap = new WorldMapSave(worldMap),
+                            PlayerCommander = CreatePlayerCommanderSave(player),
+                            Event = CreateEventSave(worldMap),
                         };
 
-                        XmlSerializer serializer = new XmlSerializer(typeof(Adventure));
+                        XmlSerializer serializer = new XmlSerializer(typeof(CampaignSave));
                         serializer.Serialize(stream, adventure);
                     }
                     catch (InvalidOperationException ex)
@@ -770,61 +763,75 @@ namespace SpaceShooter
             }
         }
 
-        private static PlayerCommanderForSave CreatePlayerCommanderForSave(PlayerCommander player)
+        private static PlayerCommanderSave CreatePlayerCommanderSave(PlayerCommander player)
         {
-            List<FleetShipForSave> campaignShips = new List<FleetShipForSave>();
+            List<FleetShipSave> campaignShips = new List<FleetShipSave>();
             foreach (FleetShip fleetShip in player.campaignShips)
             {
-                campaignShips.Add(new FleetShipForSave(fleetShip));
+                campaignShips.Add(CreateFleetShipSave(fleetShip));
             }
 
-            PlayerCommanderForSave playerCommanderSave = new PlayerCommanderForSave
+            PlayerCommanderSave playerCommanderSave = new PlayerCommanderSave
             {
-                inventoryItems = CreateInventoryItemsForSave(player.inventoryItems),
+                inventoryItems = CreateInventoryItemSaveList(player.inventoryItems),
                 campaignShips = campaignShips,
             };
             return playerCommanderSave;
         }
 
-        private static List<InventoryItemForSave> CreateInventoryItemsForSave(List<InventoryItem> inventoryItems)
+        private static FleetShipSave CreateFleetShipSave(FleetShip fleetShip)
         {
-            List<InventoryItemForSave> inventoryItemsForSave = new List<InventoryItemForSave>();
+            FleetShipSave fleetShipForSave = new FleetShipSave()
+            {
+                captainName = fleetShip.captainName,
+                shipType = fleetShip.shipData.modelname,
+                upgradeArray = CreateInventoryItemSaveArray(fleetShip.upgradeArray),
+                veterancy = fleetShip.veterancy,
+                childShip = fleetShip.childShip,
+                stats = fleetShip.stats,
+            };
+            return fleetShipForSave;
+        }
+
+        private static List<InventoryItemSave> CreateInventoryItemSaveList(List<InventoryItem> inventoryItems)
+        {
+            List<InventoryItemSave> inventoryItemsForSave = new List<InventoryItemSave>();
             foreach (InventoryItem item in inventoryItems)
             {
-                inventoryItemsForSave.Add(new InventoryItemForSave(item));
+                inventoryItemsForSave.Add(new InventoryItemSave(item));
             }
             return inventoryItemsForSave;
         }
 
-        public static InventoryItemForSave[] CreateUpgradeArrayForSave(InventoryItem[] upgradeArray)
+        public static InventoryItemSave[] CreateInventoryItemSaveArray(InventoryItem[] upgradeArray)
         {
             int upgradeArrayLength = upgradeArray.Length;
-            InventoryItemForSave[] upgradeArrayForSave = new InventoryItemForSave[upgradeArrayLength];
+            InventoryItemSave[] upgradeArrayForSave = new InventoryItemSave[upgradeArrayLength];
             for (int i = 0; i < upgradeArrayLength; i++)
             {
                 InventoryItem item = upgradeArray[i];
                 if (item != null)
                 {
-                    upgradeArrayForSave[i] = new InventoryItemForSave(item);
+                    upgradeArrayForSave[i] = new InventoryItemSave(item);
                 }
             }
 
             return upgradeArrayForSave;
         }
 
-        private static EventForSave CreateEventForSave(WorldMap worldMap)
+        private static EventSave CreateEventSave(WorldMap worldMap)
         {
             EventManager eventManager = worldMap.evManager;
-            List<InventoryItemForSave> tradeItems = new List<InventoryItemForSave>();
+            List<InventoryItemSave> tradeItems = new List<InventoryItemSave>();
             foreach (InventoryItem item in eventManager.tradeItems)
             {
-                tradeItems.Add(new InventoryItemForSave(item));
+                tradeItems.Add(new InventoryItemSave(item));
             }
 
-            List<InventoryItemForSave> inventoryPool = new List<InventoryItemForSave>();
+            List<InventoryItemSave> inventoryPool = new List<InventoryItemSave>();
             foreach (InventoryItem item in eventManager.inventoryPool)
             {
-                inventoryPool.Add(new InventoryItemForSave(item));
+                inventoryPool.Add(new InventoryItemSave(item));
             }
 
             List<LogEvent> logs = new List<LogEvent>();
@@ -857,7 +864,7 @@ namespace SpaceShooter
                 unlockableEventPool.Add(ev.GetType().Name);
             }
 
-            EventForSave eventForSave = new EventForSave
+            EventSave eventForSave = new EventSave
             {
                 kToucansOnboard = eventManager.kToucansOnboard,
                 kPandaOnboard = eventManager.kPandaOnboard,
@@ -872,6 +879,13 @@ namespace SpaceShooter
                 unlockableEventPool = unlockableEventPool,
             };
             return eventForSave;
+        }
+
+        // Load the adventure data from adventure.xml
+        public CampaignLoad LoadAdventure()
+        {
+
+            return new CampaignLoad();
         }
     }
 }
