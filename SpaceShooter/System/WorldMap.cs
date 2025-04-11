@@ -141,9 +141,9 @@ namespace SpaceShooter
         }
 
 
-        CloudManager cloudManager;
+        public CloudManager cloudManager;
 
-        SysMenuManager menuManager;
+        public SysMenuManager menuManager;
         public SysMenuManager MenuManager
         {
             get { return menuManager; }
@@ -159,6 +159,7 @@ namespace SpaceShooter
 
         public List<Location> Locations
         {
+            set { locations = value; }
             get { return locations; }
         }
 

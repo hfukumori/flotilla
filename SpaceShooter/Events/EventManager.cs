@@ -64,6 +64,7 @@ namespace SpaceShooter
         public List<LogEvent> Logs
         {
             get { return log; }
+            set { log = value; }
         }
 
 
@@ -85,7 +86,7 @@ namespace SpaceShooter
 
 
         public List<Event> unlockableEventPool;
-        SysMenuManager menuManager;
+        public SysMenuManager menuManager;
 
 
 

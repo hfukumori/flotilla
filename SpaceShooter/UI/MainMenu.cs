@@ -28,7 +28,11 @@ namespace SpaceShooter
         {
             canBeExited = false;
 
-            MenuItem item = new MenuItem(string.Format(Resource.MenuCampaign, FrameworkCore.adventureNumber));
+            MenuItem item = new MenuItem("Continue Adventure X");
+            item.Selected += OnSelectContinueCampaign;
+            base.AddItem(item);
+
+            item = new MenuItem(string.Format(Resource.MenuCampaign, FrameworkCore.adventureNumber));
             item.Selected += OnSelectCampaign;
             base.AddItem(item);
 
@@ -93,6 +97,11 @@ namespace SpaceShooter
             Owner.AddMenu(new HighScoreMenu());
         }
 
+        private void OnSelectContinueCampaign(object sender, EventArgs e)
+        {
+            FrameworkCore.storagemanager.LoadAdventure();
+            CampaignManager.ContinueCampaign();
+        }
         private void OnSelectCampaign(object sender, EventArgs e)
         {
             Owner.AddMenu(new CampaignMenu());
