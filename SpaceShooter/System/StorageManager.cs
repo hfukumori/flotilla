@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Storage;
 using System.IO;
 using System.Xml.Serialization;
 #if XBOX
-    using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.GamerServices;
 #endif
 
 
@@ -33,7 +33,7 @@ namespace SpaceShooter
 #if WINDOWS
             true;
 #else
-                false;
+            false;
 #endif
         public bool player2UseMouse = false;
     }
@@ -55,10 +55,10 @@ namespace SpaceShooter
         public bool p2vibration = true;
 
         public int[] skirmishArray = new int[24]{
-                0,1,-1,-1,-1,-1,
-                0,1,-1,-1,-1,-1,
-                0,1,-1,-1,-1,-1,
-                0,1,-1,-1,-1,-1};
+            0,1,-1,-1,-1,-1,
+            0,1,-1,-1,-1,-1,
+            0,1,-1,-1,-1,-1,
+            0,1,-1,-1,-1,-1};
 
 #if WINDOWS
         public string playerName = Helpers.GenerateName("Gamertag");
@@ -77,7 +77,7 @@ namespace SpaceShooter
         {
             int Count = 25;
             commanderName = new string[Count];
-            scores = new int[Count];
+            scores = new int[Count];    
             this.count = Count;
 
             for (int i = 0; i < Count; i++)
@@ -211,7 +211,7 @@ namespace SpaceShooter
     public class StorageManager
     {
         static public readonly string GAMENAME = "Flotilla";
-        static public readonly string SAVEFILE = "saveinfo.dat";
+        static public readonly string SAVEFILE= "saveinfo.dat";
         static public readonly string SCOREFILE = "scores.dat";
         static public readonly string PCFILE = "settings.xml";
         static public readonly string ADVENTUREFILE = "adventure.xml";
@@ -228,7 +228,7 @@ namespace SpaceShooter
         public StorageManager()
         {
 #if XBOX
-                StorageDevice.DeviceChanged += new EventHandler<EventArgs>(StorageDeviceDeviceChanged);
+            StorageDevice.DeviceChanged += new EventHandler<EventArgs>(StorageDeviceDeviceChanged);
 #endif
         }
 
@@ -462,7 +462,7 @@ namespace SpaceShooter
             data.brightness = (int)MathHelper.Clamp(data.brightness, 0, 10);
             data.volume = (int)MathHelper.Clamp(data.volume, 0, 10);
             data.music = (int)MathHelper.Clamp(data.music, 0, 10);
-
+                        
             return data;
         }
 
@@ -497,7 +497,7 @@ namespace SpaceShooter
                         writer.Write((bool)infoData.p2vibration);
 
 #if WINDOWS
-                        writer.Write((string)infoData.playerName);
+                    writer.Write((string)infoData.playerName);
 #endif
 
                         writer.Close();
@@ -618,75 +618,75 @@ namespace SpaceShooter
 
 
 
-
+        
 
 
         //do NOT use this on the xbox. this function is PC specific.
         public OptionsData LoadOptionsPC()
         {
-            //these 3 lines will make the xbox explode.
-            OptionsData data = null;
-            IAsyncResult result = StorageDevice.BeginShowSelector(null, null);
-            device = StorageDevice.EndShowSelector(result);
+                //these 3 lines will make the xbox explode.
+                OptionsData data = null;
+                IAsyncResult result = StorageDevice.BeginShowSelector(null, null);
+                device = StorageDevice.EndShowSelector(result);
 
-            bool createFile = false;
+                bool createFile = false;
 
-            using (StorageContainer container = device.OpenContainer(GAMENAME))
-            {
-                // Open the file, create if necessary.
-                using (Stream stream = container.OpenFile(PCFILE, FileMode.OpenOrCreate, FileAccess.Read))
+                using (StorageContainer container = device.OpenContainer(GAMENAME))
                 {
-                    // Read the data from the file
-
-                    try
+                    // Open the file, create if necessary.
+                    using (Stream stream = container.OpenFile(PCFILE, FileMode.OpenOrCreate, FileAccess.Read))
                     {
-                        XmlSerializer serializer = new XmlSerializer(typeof(OptionsData));
-                        data = (OptionsData)serializer.Deserialize(stream);
-                    }
-                    catch
-                    {
-                        //something went caca, so load default data.
-                        //data = new OptionsData();
-                        createFile = true;
-                    }
-                }
+                        // Read the data from the file
 
-                //if (!File.Exists(fullpath))
-                if (createFile)
-                {
-                    //If the file doesn't exist, make a new one.
-                    OptionsData newData = new OptionsData();
-
-                    //choose desktop resolution.
-                    SDL2.SDL.SDL_DisplayMode mode;
-                    SDL2.SDL.SDL_GetCurrentDisplayMode(0, out mode);
-                    newData.VideoWidth = mode.w;
-                    newData.VideoHeight = mode.h;
-
-
-                    using (Stream stream = container.OpenFile(PCFILE, FileMode.Create))
-                    {
                         try
                         {
-                            // Convert the object to XML data and put it in the stream
                             XmlSerializer serializer = new XmlSerializer(typeof(OptionsData));
-                            serializer.Serialize(stream, newData);
+                            data = (OptionsData)serializer.Deserialize(stream);
                         }
                         catch
                         {
+                            //something went caca, so load default data.
+                            //data = new OptionsData();
+                            createFile = true;
                         }
                     }
 
-                    return newData;
+                    //if (!File.Exists(fullpath))
+                    if (createFile)
+                    {
+                        //If the file doesn't exist, make a new one.
+                        OptionsData newData = new OptionsData();
+
+                        //choose desktop resolution.
+                        SDL2.SDL.SDL_DisplayMode mode;
+                        SDL2.SDL.SDL_GetCurrentDisplayMode(0, out mode);
+                        newData.VideoWidth = mode.w;
+                        newData.VideoHeight = mode.h;
+
+
+                        using (Stream stream = container.OpenFile(PCFILE, FileMode.Create))
+                        {
+                            try
+                            {
+                                // Convert the object to XML data and put it in the stream
+                                XmlSerializer serializer = new XmlSerializer(typeof(OptionsData));
+                                serializer.Serialize(stream, newData);
+                            }
+                            catch
+                            {
+                            }
+                        }
+
+                        return newData;
+                    }
                 }
-            }
 
-            //sanity check the values.
-            data.VideoHeight = Math.Max(480, data.VideoHeight);
-            data.VideoWidth = Math.Max(640, data.VideoWidth);
+                //sanity check the values.
+                data.VideoHeight = Math.Max(480, data.VideoHeight);
+                data.VideoWidth = Math.Max(640, data.VideoWidth);
 
 
-            return data;
+                return data;
         }
 
 
@@ -704,7 +704,7 @@ namespace SpaceShooter
             options.manualDefault = FrameworkCore.options.manualDefault;
 
 
-
+            
 
             options.player1UseMouse = FrameworkCore.options.p1UseMouse;
             options.player2UseMouse = FrameworkCore.options.p2UseMouse;
