@@ -3046,11 +3046,20 @@ namespace SpaceShooter {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ADVENTURE {0}.
+        ///   Looks up a localized string similar to START ADVENTURE {0}.
         /// </summary>
         internal static string MenuCampaign {
             get {
                 return ResourceManager.GetString("MenuCampaign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CONTINUE ADVENTURE {0}.
+        /// </summary>
+        internal static string MenuCampaignContinue {
+            get {
+                return ResourceManager.GetString("MenuCampaignContinue", resourceCulture);
             }
         }
         
@@ -4174,6 +4183,15 @@ namespace SpaceShooter {
         internal static string MenuResumeGame {
             get {
                 return ResourceManager.GetString("MenuResumeGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RETURN TO MAIN MENU.
+        /// </summary>
+        internal static string MenuReturnToMain {
+            get {
+                return ResourceManager.GetString("MenuReturnToMain", resourceCulture);
             }
         }
         
