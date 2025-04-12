@@ -5,11 +5,11 @@ namespace SpaceShooter
 {
     public class CampaignManager
     {
-        static public void ContinueCampaign()
+        public static void ContinueCampaign()
         {
             FrameworkCore.level.ClearAll();
             
-            CampaignLoad campaignLoad = FrameworkCore.storagemanager.LoadAdventure();
+            CampaignLoad campaignLoad = FrameworkCore.storagemanager.LoadCampaign();
             // restore world map (= FrameworkCore.worldMap)
             WorldMap worldMap = campaignLoad.worldMap;
             // - restore PlayerCommander (= FrameworkCore.player[0])
@@ -24,7 +24,7 @@ namespace SpaceShooter
             FrameworkCore.worldMap.EnterMap();
         }
 
-        static private void LoadEvents(EventLoad eventLoad, EventManager evManager)
+        private static void LoadEvents(EventLoad eventLoad, EventManager evManager)
         {
             evManager.kToucansOnboard = eventLoad.kToucansOnboard;
             evManager.kPandaOnboard = eventLoad.kPandaOnboard;

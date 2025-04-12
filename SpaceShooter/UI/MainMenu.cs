@@ -99,7 +99,7 @@ namespace SpaceShooter
 
         private void OnSelectContinueCampaign(object sender, EventArgs e)
         {
-            FrameworkCore.storagemanager.LoadAdventure();
+            FrameworkCore.storagemanager.LoadCampaign();
             CampaignManager.ContinueCampaign();
         }
         private void OnSelectCampaign(object sender, EventArgs e)

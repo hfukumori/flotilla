@@ -1040,7 +1040,7 @@ namespace SpaceShooter
                             menuManager.AddMenu(new LogMenu(false, true));
                         }
                         // Save Current Adventure
-                        FrameworkCore.storagemanager.SaveAdventure(this, FrameworkCore.players[0]);
+                        FrameworkCore.storagemanager.SaveCampaign(this, FrameworkCore.players[0]);
                         worldState = WorldState.ReadyForOrders;
                         FrameworkCore.PlayCue(sounds.Music.none);
                     }

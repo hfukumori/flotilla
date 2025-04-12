@@ -214,7 +214,7 @@ namespace SpaceShooter
         static public readonly string SAVEFILE= "saveinfo.dat";
         static public readonly string SCOREFILE = "scores.dat";
         static public readonly string PCFILE = "settings.xml";
-        static public readonly string ADVENTUREFILE = "adventure.xml";
+        static public readonly string CAMPAIGNFILE = "adventure.xml";
 
         /// <summary>
         /// Location of the player profile's save area.
@@ -744,18 +744,40 @@ namespace SpaceShooter
 
         }
 
-        public void SaveAdventure(WorldMap worldMap, PlayerCommander player)
+        public bool CampaignFileExists()
         {
-            Console.WriteLine("Saving Adventure");
+            if (device == null)
+                return false;
+            using (StorageContainer container = device.OpenContainer(GAMENAME))
+            {
+                return container.FileExists(CAMPAIGNFILE);
+            }
+        }
+
+        public void DeleteCampaign()
+        {
             if (device == null)
                 return;
             using (StorageContainer container = device.OpenContainer(GAMENAME))
             {
-                using (Stream stream = container.OpenFile(ADVENTUREFILE, FileMode.Create))
+                if (container.FileExists(CAMPAIGNFILE))
+                {
+                    container.DeleteFile(CAMPAIGNFILE);
+                }
+            }
+        }
+        public void SaveCampaign(WorldMap worldMap, PlayerCommander player)
+        {
+            FNALoggerEXT.LogInfo("Saving Adventure");
+            if (device == null)
+                return;
+            using (StorageContainer container = device.OpenContainer(GAMENAME))
+            {
+                using (Stream stream = container.OpenFile(CAMPAIGNFILE, FileMode.Create))
                 {
                     try
                     {
-                        CampaignSave adventure = new CampaignSave()
+                        CampaignSave campaignSave = new CampaignSave()
                         {
                             isHardcoreMode = FrameworkCore.isHardcoreMode,
                             WorldMap = new WorldMapSave(worldMap),
@@ -764,21 +786,21 @@ namespace SpaceShooter
                         };
 
                         XmlSerializer serializer = new XmlSerializer(typeof(CampaignSave));
-                        serializer.Serialize(stream, adventure);
+                        serializer.Serialize(stream, campaignSave);
                     }
                     catch (InvalidOperationException ex)
                     {
-                        Console.WriteLine("Serialization error: " + ex.Message);
+                        FNALoggerEXT.LogError("Serialization error: " + ex.Message);
                         if (ex.InnerException != null)
                         {
-                            Console.WriteLine("Inner exception: " + ex.InnerException.Message);
+                            FNALoggerEXT.LogError("Inner exception: " + ex.InnerException.Message);
                         }
-                        Console.WriteLine(ex.StackTrace);
+                        throw ex;
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
-                        Console.WriteLine(ex.StackTrace);
+                        FNALoggerEXT.LogError(ex.Message);
+                        FNALoggerEXT.LogError(ex.StackTrace);
                     }
                 }
             }
@@ -802,7 +824,7 @@ namespace SpaceShooter
 
         private static FleetShipSave CreateFleetShipSave(FleetShip fleetShip)
         {
-            FleetShipSave fleetShipForSave = new FleetShipSave()
+            FleetShipSave fleetShipSave = new FleetShipSave()
             {
                 captainName = fleetShip.captainName,
                 shipType = fleetShip.shipData.modelname,
@@ -811,33 +833,33 @@ namespace SpaceShooter
                 childShip = fleetShip.childShip,
                 stats = fleetShip.stats,
             };
-            return fleetShipForSave;
+            return fleetShipSave;
         }
 
         private static List<InventoryItemSave> CreateInventoryItemSaveList(List<InventoryItem> inventoryItems)
         {
-            List<InventoryItemSave> inventoryItemsForSave = new List<InventoryItemSave>();
+            List<InventoryItemSave> inventoryItemSaveList = new List<InventoryItemSave>();
             foreach (InventoryItem item in inventoryItems)
             {
-                inventoryItemsForSave.Add(new InventoryItemSave(item));
+                inventoryItemSaveList.Add(new InventoryItemSave(item));
             }
-            return inventoryItemsForSave;
+            return inventoryItemSaveList;
         }
 
-        public static InventoryItemSave[] CreateInventoryItemSaveArray(InventoryItem[] upgradeArray)
+        public static InventoryItemSave[] CreateInventoryItemSaveArray(InventoryItem[] inventoryItemArray)
         {
-            int upgradeArrayLength = upgradeArray.Length;
-            InventoryItemSave[] upgradeArrayForSave = new InventoryItemSave[upgradeArrayLength];
-            for (int i = 0; i < upgradeArrayLength; i++)
+            int inventoryItemArrayLength = inventoryItemArray.Length;
+            InventoryItemSave[] inventoryItemSaveArray = new InventoryItemSave[inventoryItemArrayLength];
+            for (int i = 0; i < inventoryItemArrayLength; i++)
             {
-                InventoryItem item = upgradeArray[i];
+                InventoryItem item = inventoryItemArray[i];
                 if (item != null)
                 {
-                    upgradeArrayForSave[i] = new InventoryItemSave(item);
+                    inventoryItemSaveArray[i] = new InventoryItemSave(item);
                 }
             }
 
-            return upgradeArrayForSave;
+            return inventoryItemSaveArray;
         }
 
         private static EventSave CreateEventSave(WorldMap worldMap)
@@ -879,12 +901,12 @@ namespace SpaceShooter
             return eventPoolSave;
         }
 
-        // Load the adventure data from adventure.xml
-        public CampaignLoad LoadAdventure()
+        // Load the campaign data from adventure.xml
+        public CampaignLoad LoadCampaign()
         {
             using (StorageContainer container = device.OpenContainer(GAMENAME))
             {
-                using (Stream stream = container.OpenFile(ADVENTUREFILE, FileMode.Open))
+                using (Stream stream = container.OpenFile(CAMPAIGNFILE, FileMode.Open))
                 {
                     try
                     {
@@ -902,14 +924,14 @@ namespace SpaceShooter
                     {
                         if (ex.InnerException != null)
                         {
-                            Console.WriteLine("Serialization error. Inner exception: " + ex.InnerException.Message);
+                            FNALoggerEXT.LogError("Serialization error. Inner exception: " + ex.InnerException.Message);
                         }
                         throw ex;
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
-                        Console.WriteLine(ex.StackTrace);
+                        FNALoggerEXT.LogError(ex.Message);
+                        FNALoggerEXT.LogError(ex.StackTrace);
                         throw ex;
                     }
                 }
