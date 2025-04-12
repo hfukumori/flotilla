@@ -170,7 +170,6 @@ namespace SpaceShooter
         {
             if (Owner == null)
                 return;
-            FrameworkCore.storagemanager.DeleteCampaign();
             Owner.AddMenu(new QuitConfirm());
         }
 
