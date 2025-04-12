@@ -56,17 +56,17 @@ namespace SpaceShooter
                     item.Selected += OnSelectSelfDestruct;
                     base.AddItem(item);
                 }
-                else
-                {
-                    item = new MenuItem(Resource.MenuReturnToMain);
-                    item.Selected += OnSelectMainMenu;
-                    base.AddItem(item);
-                }
-            }
 
-            item = new MenuItem(Resource.MenuQuit);
-            item.Selected += OnSelectQuit;
-            base.AddItem(item);
+                item = new MenuItem(Resource.MenuReturnToMain);
+                item.Selected += OnSelectMainMenu;
+                base.AddItem(item);
+            }
+            else
+            {
+                item = new MenuItem(Resource.MenuQuit);
+                item.Selected += OnSelectQuit;
+                base.AddItem(item);
+            }
 
             SetupItemPositions();
         }
@@ -164,6 +164,7 @@ namespace SpaceShooter
 
         private void OnSelectMainMenu(object sender, EventArgs e)
         {
+            FrameworkCore.storagemanager.SaveCampaign(FrameworkCore.worldMap, FrameworkCore.players[0]);
             FrameworkCore.ExitToMainMenu(null);
         }
         private void OnSelectQuit(object sender, EventArgs e)
