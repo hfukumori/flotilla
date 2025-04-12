@@ -135,7 +135,7 @@ namespace SpaceShooter
     {
         public string captainName;
         public ModelType shipType;
-        public InventoryItemSave[] upgradeArray;
+        public int?[] upgradeArray;
         public int veterancy;
         public bool childShip;
         public SpaceShipStats stats;
@@ -808,27 +808,28 @@ namespace SpaceShooter
 
         private static PlayerCommanderSave CreatePlayerCommanderSave(PlayerCommander player)
         {
+            List<InventoryItem> inventoryItems = player.inventoryItems;
             List<FleetShipSave> campaignShips = new List<FleetShipSave>();
             foreach (FleetShip fleetShip in player.campaignShips)
             {
-                campaignShips.Add(CreateFleetShipSave(fleetShip));
+                campaignShips.Add(CreateFleetShipSave(fleetShip, inventoryItems));
             }
 
             PlayerCommanderSave playerCommanderSave = new PlayerCommanderSave
             {
-                inventoryItems = CreateInventoryItemSaveList(player.inventoryItems),
+                inventoryItems = CreateInventoryItemSaveList(inventoryItems),
                 campaignShips = campaignShips,
             };
             return playerCommanderSave;
         }
 
-        private static FleetShipSave CreateFleetShipSave(FleetShip fleetShip)
+        private static FleetShipSave CreateFleetShipSave(FleetShip fleetShip, List<InventoryItem> inventoryItems)
         {
             FleetShipSave fleetShipSave = new FleetShipSave()
             {
                 captainName = fleetShip.captainName,
                 shipType = fleetShip.shipData.modelname,
-                upgradeArray = CreateInventoryItemSaveArray(fleetShip.upgradeArray),
+                upgradeArray = CreateUpgradeArray(fleetShip.upgradeArray, inventoryItems),
                 veterancy = fleetShip.veterancy,
                 childShip = fleetShip.childShip,
                 stats = fleetShip.stats,
@@ -846,20 +847,22 @@ namespace SpaceShooter
             return inventoryItemSaveList;
         }
 
-        public static InventoryItemSave[] CreateInventoryItemSaveArray(InventoryItem[] inventoryItemArray)
+        public static int?[] CreateUpgradeArray(InventoryItem[] upgradeArray, List<InventoryItem> inventoryItems)
         {
-            int inventoryItemArrayLength = inventoryItemArray.Length;
-            InventoryItemSave[] inventoryItemSaveArray = new InventoryItemSave[inventoryItemArrayLength];
+            int inventoryItemArrayLength = upgradeArray.Length;
+            int?[] upgradeSaveArray = new int?[inventoryItemArrayLength];
             for (int i = 0; i < inventoryItemArrayLength; i++)
             {
-                InventoryItem item = inventoryItemArray[i];
+                InventoryItem item = upgradeArray[i];
                 if (item != null)
                 {
-                    inventoryItemSaveArray[i] = new InventoryItemSave(item);
+                    int? index = inventoryItems.IndexOf(item);
+                    // if the item is not found in the inventoryItems list, set index to null
+                    upgradeSaveArray[i] = (index != -1) ? index : null;
                 }
             }
 
-            return inventoryItemSaveArray;
+            return upgradeSaveArray;
         }
 
         private static EventSave CreateEventSave(WorldMap worldMap)
@@ -956,7 +959,7 @@ namespace SpaceShooter
             List<FleetShip> campaignShips = new List<FleetShip>();
             foreach (FleetShipSave fleetShipSave in playerCommanderSave.campaignShips)
             {
-                campaignShips.Add(RestoreFleetShip(fleetShipSave));
+                campaignShips.Add(RestoreFleetShip(fleetShipSave, inventoryItems));
             }
             return new PlayerCommanderLoad()
             {
@@ -977,13 +980,13 @@ namespace SpaceShooter
             return null;
         }
 
-        private FleetShip RestoreFleetShip(FleetShipSave fleetShipSave)
+        private FleetShip RestoreFleetShip(FleetShipSave fleetShipSave, List<InventoryItem> inventoryItems)
         {
             FleetShip fleetShip = new FleetShip
             {
                 captainName = fleetShipSave.captainName,
                 shipData = shipTypes.GetShipDataByModelType(fleetShipSave.shipType),
-                upgradeArray = RestoreInventoryItemArray(fleetShipSave.upgradeArray),
+                upgradeArray = RestoreUpgradeArray(fleetShipSave.upgradeArray, inventoryItems),
                 veterancy = fleetShipSave.veterancy,
                 childShip = fleetShipSave.childShip,
                 stats = fleetShipSave.stats
@@ -991,19 +994,19 @@ namespace SpaceShooter
             return fleetShip;
         }
 
-        private InventoryItem[] RestoreInventoryItemArray(InventoryItemSave[] upgradeArray)
+        private InventoryItem[] RestoreUpgradeArray(int?[] upgradeArraySave, List<InventoryItem> inventoryItems)
         {
-            int upgradeArrayLength = upgradeArray.Length;
-            InventoryItem[] inventoryItems = new InventoryItem[upgradeArrayLength];
+            int upgradeArrayLength = upgradeArraySave.Length;
+            InventoryItem[] upgradeArray = new InventoryItem[upgradeArrayLength];
             for (int i = 0; i < upgradeArrayLength; i++)
             {
-                InventoryItemSave itemSave = upgradeArray[i];
-                if (itemSave != null)
+                int? index = upgradeArraySave[i];
+                if (index != null)
                 {
-                    inventoryItems[i] = RestoreInventoryItem(itemSave);
+                    upgradeArray[i] = inventoryItems[(int) index];
                 }
             }
-            return inventoryItems;
+            return upgradeArray;
         }
 
         private EventLoad RestoreEvent(EventSave eventSave)
