@@ -43,8 +43,8 @@ namespace SpaceShooter
     {
         public int adventure = 1;
         public int brightness = 5;
-        public int volume = 10;
-        public int music = 10;
+        public int volume=10;
+        public int music=10;
 
         public bool p1InvertY = false;
         public bool p1InvertX = false;
@@ -77,7 +77,7 @@ namespace SpaceShooter
         {
             int Count = 25;
             commanderName = new string[Count];
-            scores = new int[Count];    
+            scores = new int[Count];     
             this.count = Count;
 
             for (int i = 0; i < Count; i++)

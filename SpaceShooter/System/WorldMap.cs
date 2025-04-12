@@ -159,8 +159,8 @@ namespace SpaceShooter
 
         public List<Location> Locations
         {
-            set { locations = value; }
             get { return locations; }
+            set { locations = value; }
         }
 
         SkyBox skyBox;
@@ -388,14 +388,8 @@ namespace SpaceShooter
         Location currentLocation = null;
         public Location CurrentLocation
         {
-            get
-            {
-                return currentLocation;
-            }
-            set
-            {
-                currentLocation = value;
-            }
+            get { return currentLocation; }
+            set { currentLocation = value; }
         }
         Location destinationLocation = null;
         Vector3 currentPosition = Vector3.Zero;
