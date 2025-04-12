@@ -549,7 +549,8 @@ namespace SpaceShooter
         public void EndGame()
         {
             fadeUpTransition = 0;
-
+            // delete saved campaign file
+            FrameworkCore.storagemanager.DeleteCampaign();
             //game over!
             menuManager.AddMenu(new GameOverMenu());
         }

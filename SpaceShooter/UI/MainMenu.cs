@@ -27,14 +27,20 @@ namespace SpaceShooter
         public MainMenu()
         {
             canBeExited = false;
+            MenuItem item;
 
-            MenuItem item = new MenuItem("Continue Adventure X");
-            item.Selected += OnSelectContinueCampaign;
-            base.AddItem(item);
-
-            item = new MenuItem(string.Format(Resource.MenuCampaign, FrameworkCore.adventureNumber));
-            item.Selected += OnSelectCampaign;
-            base.AddItem(item);
+            if (FrameworkCore.storagemanager.CampaignFileExists())
+            {
+                item = new MenuItem(string.Format(Resource.MenuCampaignContinue, FrameworkCore.adventureNumber));
+                item.Selected += OnSelectContinueCampaign;
+                base.AddItem(item);
+            }
+            else
+            {
+                item = new MenuItem(string.Format(Resource.MenuCampaign, FrameworkCore.adventureNumber));
+                item.Selected += OnSelectCampaign;
+                base.AddItem(item);
+            }
 
             item = new MenuItem(Resource.MenuHighScoresTitle);
             item.Selected += OnSelectHighScores;

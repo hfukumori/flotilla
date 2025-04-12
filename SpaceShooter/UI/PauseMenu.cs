@@ -48,15 +48,24 @@ namespace SpaceShooter
             item.Selected += OnBugReport;
             base.AddItem(item);
 #endif
-            if (FrameworkCore.isCampaign && DestructAvailable())
+            if (FrameworkCore.isCampaign)
             {
-                item = new MenuItem(Resource.MenuSelfDestruct);
-                item.Selected += OnSelectSelfDestruct;
-                base.AddItem(item);
+                if (DestructAvailable())
+                {
+                    item = new MenuItem(Resource.MenuSelfDestruct);
+                    item.Selected += OnSelectSelfDestruct;
+                    base.AddItem(item);
+                }
+                else
+                {
+                    item = new MenuItem(Resource.MenuReturnToMain);
+                    item.Selected += OnSelectMainMenu;
+                    base.AddItem(item);
+                }
             }
 
             item = new MenuItem(Resource.MenuQuit);
-            item.Selected += OnSelectMainMenu;
+            item.Selected += OnSelectQuit;
             base.AddItem(item);
 
             SetupItemPositions();
@@ -155,9 +164,13 @@ namespace SpaceShooter
 
         private void OnSelectMainMenu(object sender, EventArgs e)
         {
+            FrameworkCore.ExitToMainMenu(null);
+        }
+        private void OnSelectQuit(object sender, EventArgs e)
+        {
             if (Owner == null)
                 return;
-
+            FrameworkCore.storagemanager.DeleteCampaign();
             Owner.AddMenu(new QuitConfirm());
         }
 
