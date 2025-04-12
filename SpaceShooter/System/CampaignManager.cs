@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace SpaceShooter
 {
@@ -7,23 +8,31 @@ namespace SpaceShooter
     {
         public static void ContinueCampaign()
         {
-            FrameworkCore.level.ClearAll();
-            
-            CampaignLoad campaignLoad = FrameworkCore.storagemanager.LoadCampaign();
-            // restore world map (= FrameworkCore.worldMap)
-            WorldMap worldMap = campaignLoad.worldMap;
-            // - restore PlayerCommander (= FrameworkCore.player[0])
-            FrameworkCore.players[0].inventoryItems = campaignLoad.playerCommander.inventoryItems;
-            FrameworkCore.players[0].campaignShips = campaignLoad.playerCommander.campaignShips;
-            // - restore events (= FrameworkCore.eventManager)
-            LoadEvents(campaignLoad.eventLoad, worldMap.evManager);
+            try
+            {
+                FrameworkCore.level.ClearAll();
+                CampaignLoad campaignLoad = FrameworkCore.storagemanager.LoadCampaign();
+                // restore world map (= FrameworkCore.worldMap)
+                WorldMap worldMap = campaignLoad.worldMap;
+                // - restore PlayerCommander (= FrameworkCore.player[0])
+                FrameworkCore.players[0].inventoryItems = campaignLoad.playerCommander.inventoryItems;
+                FrameworkCore.players[0].campaignShips = campaignLoad.playerCommander.campaignShips;
+                // - restore events (= FrameworkCore.eventManager)
+                LoadEvents(campaignLoad.eventLoad, worldMap.evManager);
 
-            FrameworkCore.worldMap = worldMap;
-            FrameworkCore.worldMap.cloudManager = new CloudManager();
-            FrameworkCore.gameState = GameState.WorldMap;
-            FrameworkCore.worldMap.EnterMap();
+                FrameworkCore.worldMap = worldMap;
+                FrameworkCore.worldMap.cloudManager = new CloudManager();
+                FrameworkCore.gameState = GameState.WorldMap;
+                FrameworkCore.worldMap.EnterMap();
+            }
+            catch (Exception e)
+            {
+                FNALoggerEXT.LogError("CampaignManager.ContinueCampaign failed.");
+                FNALoggerEXT.LogError(e.ToString());
+                FrameworkCore.storagemanager.DeleteCampaign();
+                FrameworkCore.ExitToMainMenu(null);
+            }
         }
-
         private static void LoadEvents(EventLoad eventLoad, EventManager evManager)
         {
             evManager.kToucansOnboard = eventLoad.kToucansOnboard;
