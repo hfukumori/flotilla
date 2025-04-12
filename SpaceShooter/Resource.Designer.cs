@@ -4187,7 +4187,7 @@ namespace SpaceShooter {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to RETURN TO MAIN MENU.
+        ///   Looks up a localized string similar to SAVE AND RETURN TO MAIN MENU.
         /// </summary>
         internal static string MenuReturnToMain {
             get {

@@ -48,23 +48,21 @@ namespace SpaceShooter
             item.Selected += OnBugReport;
             base.AddItem(item);
 #endif
-            if (FrameworkCore.isCampaign)
+            if (FrameworkCore.isCampaign && DestructAvailable())
             {
-                if (DestructAvailable())
-                {
-                    item = new MenuItem(Resource.MenuSelfDestruct);
-                    item.Selected += OnSelectSelfDestruct;
-                    base.AddItem(item);
-                }
-
-                item = new MenuItem(Resource.MenuReturnToMain);
-                item.Selected += OnSelectMainMenu;
+                item = new MenuItem(Resource.MenuSelfDestruct);
+                item.Selected += OnSelectSelfDestruct;
                 base.AddItem(item);
             }
-            else
-            {
-                item = new MenuItem(Resource.MenuQuit);
-                item.Selected += OnSelectQuit;
+
+            item = new MenuItem(Resource.MenuQuit);
+            item.Selected += OnSelectQuit;
+            base.AddItem(item);
+
+            if (FrameworkCore.isCampaign && !DestructAvailable())
+            { 
+                item = new MenuItem(Resource.MenuReturnToMain);
+                item.Selected += OnSelectMainMenu;
                 base.AddItem(item);
             }
 

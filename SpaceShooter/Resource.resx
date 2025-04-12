@@ -2468,6 +2468,6 @@ THIS CELESTIAL WEAPON</value>
     <value>CONTINUE ADVENTURE {0}</value>
   </data>
   <data name="MenuReturnToMain" xml:space="preserve">
-    <value>RETURN TO MAIN MENU</value>
+    <value>SAVE AND RETURN TO MAIN MENU</value>
   </data>
 </root>
