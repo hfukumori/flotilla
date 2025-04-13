@@ -128,6 +128,7 @@ namespace SpaceShooter
     {
         public List<InventoryItemSave> inventoryItems;
         public List<FleetShipSave> campaignShips;
+        public int planetsVisited;
     }
 
     [Serializable]
@@ -182,6 +183,7 @@ namespace SpaceShooter
     {
         public List<InventoryItem> inventoryItems;
         public List<FleetShip> campaignShips;
+        public int planetsVisited;
     }
 
     public class EventLoad
@@ -819,6 +821,7 @@ namespace SpaceShooter
             {
                 inventoryItems = CreateInventoryItemSaveList(inventoryItems),
                 campaignShips = campaignShips,
+                planetsVisited = player.planetsVisited,
             };
             return playerCommanderSave;
         }
@@ -964,7 +967,8 @@ namespace SpaceShooter
             return new PlayerCommanderLoad()
             {
                 inventoryItems = inventoryItems,
-                campaignShips = campaignShips
+                campaignShips = campaignShips,
+                planetsVisited = playerCommanderSave.planetsVisited
             };
         }
 
