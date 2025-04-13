@@ -930,7 +930,7 @@ namespace SpaceShooter
                     {
                         if (ex.InnerException != null)
                         {
-                            FNALoggerEXT.LogError("Serialization error. Inner exception: " + ex.InnerException.Message);
+                            FNALoggerEXT.LogError("Deserialization error. Inner exception: " + ex.InnerException.Message);
                         }
                         throw ex;
                     }
@@ -977,8 +977,17 @@ namespace SpaceShooter
             Type itemType = Type.GetType(itemSave.itemType);
             if (itemType != null)
             {
+                InventoryItem item;
                 float? constructorParam = itemSave.constructorParam;
-                InventoryItem item = (InventoryItem)Activator.CreateInstance(itemType, constructorParam);
+                if (constructorParam.HasValue)
+                {
+                    item = (InventoryItem)Activator.CreateInstance(itemType, constructorParam.Value);
+                }
+                else
+                {
+                    item = (InventoryItem)Activator.CreateInstance(itemType);
+                }
+
                 return item;
             }
             return null;
