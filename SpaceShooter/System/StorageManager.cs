@@ -871,28 +871,19 @@ namespace SpaceShooter
         private static EventSave CreateEventSave(WorldMap worldMap)
         {
             EventManager eventManager = worldMap.evManager;
-            List<InventoryItemSave> tradeItems = CreateInventoryItemSaveList(eventManager.tradeItems);
-            List<InventoryItemSave> inventoryPool = CreateInventoryItemSaveList(eventManager.inventoryPool);
-
-            List<LogEvent> logs = eventManager.Logs;
-            List<String> eventPool = CreateEventPoolSave(eventManager.eventPool);
-            List<String> dangerPool = CreateEventPoolSave(eventManager.dangerPool);
-            List<String> wormPool = CreateEventPoolSave(eventManager.wormPool);
-            List<String> unlockableEventPool = CreateEventPoolSave(eventManager.unlockableEventPool);
-
             EventSave eventSave = new EventSave
             {
                 kToucansOnboard = eventManager.kToucansOnboard,
                 kPandaOnboard = eventManager.kPandaOnboard,
                 kCrisiumOnBoard = eventManager.kCrisiumOnBoard,
                 kHaveGauntlet = eventManager.kHaveGauntlet,
-                tradeItems = tradeItems,
-                Logs = logs,
-                inventoryPool = inventoryPool,
-                eventPool = eventPool,
-                dangerPool = dangerPool,
-                wormPool = wormPool,
-                unlockableEventPool = unlockableEventPool,
+                tradeItems = CreateInventoryItemSaveList(eventManager.tradeItems),
+                Logs = eventManager.Logs,
+                inventoryPool = CreateInventoryItemSaveList(eventManager.inventoryPool),
+                eventPool = CreateEventPoolSave(eventManager.eventPool),
+                dangerPool = CreateEventPoolSave(eventManager.dangerPool),
+                wormPool = CreateEventPoolSave(eventManager.wormPool),
+                unlockableEventPool = CreateEventPoolSave(eventManager.unlockableEventPool),
             };
             return eventSave;
         }
