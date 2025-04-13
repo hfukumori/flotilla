@@ -17,6 +17,7 @@ namespace SpaceShooter
                 // - restore PlayerCommander (= FrameworkCore.player[0])
                 FrameworkCore.players[0].inventoryItems = campaignLoad.playerCommander.inventoryItems;
                 FrameworkCore.players[0].campaignShips = campaignLoad.playerCommander.campaignShips;
+                FrameworkCore.players[0].planetsVisited = campaignLoad.playerCommander.planetsVisited;
                 // - restore events (= FrameworkCore.eventManager)
                 LoadEvents(campaignLoad.eventLoad, worldMap.evManager);
 
