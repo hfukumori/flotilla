@@ -25,6 +25,7 @@ namespace SpaceShooter
                 FrameworkCore.worldMap.cloudManager = new CloudManager();
                 FrameworkCore.gameState = GameState.WorldMap;
                 FrameworkCore.worldMap.EnterMap();
+                FrameworkCore.isHardcoreMode = campaignLoad.isHardcoreMode;
             }
             catch (Exception e)
             {
