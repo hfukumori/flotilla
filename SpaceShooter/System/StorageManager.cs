@@ -129,6 +129,9 @@ namespace SpaceShooter
         public List<InventoryItemSave> inventoryItems;
         public List<FleetShipSave> campaignShips;
         public int planetsVisited;
+        public int dangerousPlanetsVisited;
+        public int extraPoints;
+        public int commandPoints;
     }
 
     [Serializable]
@@ -184,6 +187,9 @@ namespace SpaceShooter
         public List<InventoryItem> inventoryItems;
         public List<FleetShip> campaignShips;
         public int planetsVisited;
+        public int dangerousPlanetsVisited;
+        public int extraPoints;
+        public int commandPoints;
     }
 
     public class EventLoad
@@ -822,6 +828,9 @@ namespace SpaceShooter
                 inventoryItems = CreateInventoryItemSaveList(inventoryItems),
                 campaignShips = campaignShips,
                 planetsVisited = player.planetsVisited,
+                dangerousPlanetsVisited = player.dangerousPlanetsVisited,
+                extraPoints = player.extraPoints,
+                commandPoints = player.commandPoints,
             };
             return playerCommanderSave;
         }
@@ -959,7 +968,10 @@ namespace SpaceShooter
             {
                 inventoryItems = inventoryItems,
                 campaignShips = campaignShips,
-                planetsVisited = playerCommanderSave.planetsVisited
+                planetsVisited = playerCommanderSave.planetsVisited,
+                dangerousPlanetsVisited = playerCommanderSave.dangerousPlanetsVisited,
+                extraPoints = playerCommanderSave.extraPoints,
+                commandPoints = playerCommanderSave.commandPoints,
             };
         }
 
